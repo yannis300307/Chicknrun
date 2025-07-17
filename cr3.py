@@ -66,4 +66,10 @@ def check():
 		return
 	print("All checks done. See if errors have been raised.")
 
+@cc.command
+def update():
+	"""Update Chicknrun to the latest version."""
+	print("Fetching latest version...")
+	call("cd ~/.chicknrun && git fetch && git pull", shell=True)
+
 cc.handle_commands()
