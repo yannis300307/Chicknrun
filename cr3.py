@@ -10,18 +10,18 @@ def compile(name: str = "binary"):
 @cc.command
 def run(args: str = ""):
 	"""Compile all the c files in the directory with the needed flags and run the program."""
-	call("cc -Wall -Werror -Wextra *.c -o binary", shell=True)
-	call("./binary " + args, shell=True)
-	os.remove("./binary")
+	if call("cc -Wall -Werror -Wextra *.c -o binary", shell=True):
+		call("./binary " + args, shell=True)
+		os.remove("./binary")
 
 @cc.command
 def run_main(content: str = ""):
 	"""Add a custom main to the program and run it. It doesn't modify the file."""
 	files = "".join([f"#include \\\"{f[2:]}\\\"\\n" for f in getoutput("find . -name \"*.c\"").split("\n")])
 
-	call("printf '%b\\n' \"#include <stdio.h>\\n#include <stdlib.h>\\n#include <unistd.h>\\n" + files + "int main() {" + content + "}\" | cc -Wall -Wextra -Werror -o binary -x c -", shell=True)
-	call("./binary", shell=True)
-	os.remove("./binary")
+	if call("printf '%b\\n' \"#include <stdio.h>\\n#include <stdlib.h>\\n#include <unistd.h>\\n" + files + "int main() {" + content + "}\" | cc -Wall -Wextra -Werror -o binary -x c -", shell=True):
+		call("./binary", shell=True)
+		os.remove("./binary")
 
 @cc.command
 def norminette():
@@ -51,8 +51,8 @@ def check():
 	print("Check Norminette")
 	norminette()
 	print("Check compilation")
-	call("echo \"int main() {}\" | cc */*.c -Wall -Wextra -Werror -o binary -x c -", shell=True)
-	os.remove("./binary")
+	if call("echo \"int main() {}\" | cc */*.c -Wall -Wextra -Werror -o binary -x c -", shell=True) == 0:
+		os.remove("./binary")
 	print("Check git uncommitted changes")
 	out = getoutput("git ls-files -m -o")
 	if len(out) > 1:
