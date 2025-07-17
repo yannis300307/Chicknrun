@@ -53,18 +53,25 @@ def check():
 	print("Check compilation")
 	if call("echo \"int main() {}\" | cc */*.c -Wall -Wextra -Werror -o binary -x c -", shell=True) == 0:
 		os.remove("./binary")
+		print("\x1B[32mCompilation passed\x1B[0m")
+	else:
+		cc.print_error("Can't compile!")
 	print("Check git uncommitted changes")
 	out = getoutput("git ls-files -m -o")
 	if len(out) > 1:
 		cc.print_error("Uncommitted changes detected!\n" + out)
 		return
-	print("Passed")
+	else:
+		print("\x1B[32mNo unstaged changes.\x1B[0m")
+	
 	print("Check Non-pushed commits")
 	out = getoutput("git log --oneline --branches --not --remotes")
 	if len(out) > 1:
-		cc.print_error("Commit not pushed!\n" + out)
+		cc.print_error("Commits not pushed!\n" + out)
 		return
-	print("All checks done. See if errors have been raised.")
+	else:
+		print("\x1B[32mAll commits have been pushed!\x1B[0m")
+	print("All checks done. Nice!")
 
 @cc.command
 def update():
