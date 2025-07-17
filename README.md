@@ -10,6 +10,7 @@ Type `cr3 help` to get a list of all the commands.
 - Check the Norminette with needed flags (`cr3 norminette`)
 - Check Norminette, compilation errors, unstaged commits and non pushed commits (`cr3 check`)
 - Fast temporary main writing (`cr3 run_main "[Escaped main content]"`)
+- Compile and run GDB (`cr3 run_gdb`)
 - One command update (`cr3 update`)
 - Automatic exercises directories and .gitignore creation (`cr3 create_dirs [amount]`)
 
