@@ -1,6 +1,8 @@
 import customcommand as cc
+from prettyprint import error, warn, info, success, ask
 from subprocess import call, getoutput
 import os
+
 
 @cc.command
 def compile(name: str = "binary"):
@@ -33,6 +35,7 @@ def run_gdb():
 @cc.command
 def norminette():
 	"""Run `norminette -R CheckForbiddenSourceHeader`."""
+	info("Check Norminette")
 	call("norminette -R CheckForbiddenSourceHeader", shell=True)
 
 @cc.command
@@ -55,35 +58,50 @@ def create_dirs(maxi: int):
 @cc.command
 def check():
 	"""Check norminette, compilation, git modified files, unpushed commits."""
-	print("Check Norminette")
 	norminette()
-	print("Check compilation")
+	info("Check compilation")
 	if call("echo \"int main() {}\" | cc */*.c -Wall -Wextra -Werror -o binary -x c -", shell=True) == 0:
 		os.remove("./binary")
-		print("\x1B[32mCompilation passed\x1B[0m")
+		success("Compilation passed")
 	else:
-		cc.print_error("Can't compile!")
-	print("Check git uncommitted changes")
+		error("Can't compile!")
+	info("Check git uncommitted changes")
 	out = getoutput("git ls-files -m -o")
 	if len(out) > 1:
-		cc.print_error("Uncommitted changes detected!\n" + out)
+		error("Uncommitted changes detected!\n" + out)
 		return
 	else:
-		print("\x1B[32mNo unstaged changes.\x1B[0m")
+		success("No unstaged changes.")
 	
-	print("Check Non-pushed commits")
+	info("Check Non-pushed commits")
 	out = getoutput("git log --oneline --branches --not --remotes")
 	if len(out) > 1:
-		cc.print_error("Commits not pushed!\n" + out)
+		error("Commits not pushed!\n" + out)
 		return
 	else:
-		print("\x1B[32mAll commits have been pushed!\x1B[0m")
-	print("All checks done. Nice!")
+		success("All commits have been pushed!")
+	success("All checks done. Nice!")
+
+@cc.command
+def evaluate():
+	"""Check Norminette and open all files in git"""
+	norminette()
+	files = getoutput('find . -name \"*.c\"').split('\n')
+	if files == [""]:
+		warn("No file has been found.")
+		return
+	if len(files) >= 5 and ask(f"{len(files)} tabs will be opened. Continue? [y/N]:") not in ("y", "yes"):
+			warn("Process aborted.")
+			return
+	info(f"Opening {len(files)} files in Vim")
+	for file in reversed(files):
+		call(f"gnome-terminal --tab -- vim {file}", shell=True)
+	
 
 @cc.command
 def update():
 	"""Update Chicknrun to the latest version."""
-	print("Fetching latest version...")
+	info("Fetching latest version...")
 	call("cd ~/.chicknrun && git fetch && git pull", shell=True)
 
 cc.handle_commands()
