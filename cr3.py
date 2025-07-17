@@ -24,6 +24,13 @@ def run_main(content: str = ""):
 		os.remove("./binary")
 
 @cc.command
+def run_gdb():
+	"""Compile and run GDB."""
+	if call("cc -Wall -Werror -Wextra *.c -o binary -g", shell=True) == 0:
+		call("gdb ./binary -tui", shell=True)
+		os.remove("./binary")
+
+@cc.command
 def norminette():
 	"""Run `norminette -R CheckForbiddenSourceHeader`."""
 	call("norminette -R CheckForbiddenSourceHeader", shell=True)
