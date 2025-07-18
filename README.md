@@ -2,7 +2,7 @@
 
 Chicknrun is a command line tool written in Python that can help you to be much more efficient during 42' piscine.
 
-Type `cr3 help` to get a list of all the commands.
+Type `cr3 help` to get a list of all the commands and available flags.
 
 ## Features:
 - Compilation with the needed flags (`cr3 compile`)
@@ -10,6 +10,7 @@ Type `cr3 help` to get a list of all the commands.
 - Check the Norminette with needed flags (`cr3 norminette`)
 - Check Norminette, compilation errors, unstaged commits and non pushed commits (`cr3 check`)
 - Fast temporary main writing (`cr3 run_main "[Escaped main content]"`)
+- Evaluation mode that opens all C files in subdirectories (`cr3 evaluate`)
 - Compile and run GDB (`cr3 run_gdb`)
 - One command update (`cr3 update`)
 - Automatic exercises directories and .gitignore creation (`cr3 create_dirs [amount]`)
