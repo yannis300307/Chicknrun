@@ -24,4 +24,9 @@ Run the command :
 git clone https://github.com/yannis300307/Chicknrun.git ~/.chicknrun && echo "alias cr3=\"python3 ~/.chicknrun/cr3.py\"" >> ~/.zshrc && source ~/.zshrc
 ```
 
+For a temporary install, you can run:
+```bash
+git clone https://github.com/yannis300307/Chicknrun.git /tmp/ch && alias cr8="python3 /tmp/ch/cr3.py"
+```
+
 This command will create the `~/.chicknrun` folder and add the alias at the end of `~/.zshrc`.
