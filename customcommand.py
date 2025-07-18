@@ -6,6 +6,8 @@ import textwrap
 import types
 import warnings
 
+from prettyprint import error, warn
+
 registered = []
 filename = os.path.basename(inspect.getfile(sys.modules["__main__"]))
 
@@ -43,7 +45,6 @@ def command(func: types.FunctionType):
 
     return func
 
-
 @command
 def help_():
     """Show this help. List all the commands."""
@@ -58,30 +59,108 @@ def help_():
                 t = "str"
             else:
                 t = arg.annotation.__name__
-            if arg.default is arg.empty:
-                print(f"        Required - {arg.name}: {t}")
-            else:
-                print(f"        Optional - {arg.name}: {t}")
-        print("    Syntax: ", end="")
+            kind = "Required" if arg.default is arg.empty else "Optional"
+            print(f"        {kind} - {arg.name}: {t} (can be used as -{arg.name})")
+        print("    Positional Syntax: ", end="")
         for arg in i["parameters"]:
             print(f"<{arg.name}>" if arg.default is arg.empty else f"[{arg.name}]", end=" ")
-        print()
-
-
-def print_error(text):
-    print("\x1b[1;31m"+text+"\x1b[0m")
+        print("\n    Keyword Syntax: ", end="")
+        for arg in i["parameters"]:
+            print(f"-{arg.name} <value>", end=" ")
+        print("\n")
 
 
 def handle_commands():
     if len(sys.argv) < 2:
-        print_error(f"Missing argument! See `python {filename} help` for help.")
+        error(f"Missing argument! See 'python {filename} help' for help.")
+        return
+
+    cmd_name = sys.argv[1]
+    args = sys.argv[2:]
+
+    for i in registered:
+        if i["name"] == cmd_name:
+            parameters = i["parameters"]
+            required_count = i["required_arg_count"]
+
+            pos_args = []
+            kw_args = {}
+            param_names = {p.name for p in parameters}
+            skip_next = False
+            
+            for idx, arg in enumerate(args):
+                if skip_next:
+                    skip_next = False
+                    continue
+                if arg.startswith("-"):
+                    if idx + 1 >= len(args):
+                        error(f"Missing value for keyword argument '{arg}'.")
+                        return
+                    kw_name = arg[1:]
+                    kw_args[kw_name] = args[idx + 1]
+                    skip_next = True
+                else:
+                    pos_args.append(arg)
+
+            for key in kw_args:
+                if key not in param_names:
+                    warn(f"Unknown keyword argument '-{key}'.")
+            
+            if len(pos_args) > len(parameters):
+                error(f"Too many positional arguments! See 'python {filename} help' for help.")
+                return
+
+            if len(pos_args) < required_count:
+                missing = parameters[len(pos_args)].name
+                error(f"Missing argument '{missing}'! See 'python {filename} help' for help.")
+                return
+
+            final_args = []
+            final_kwargs = {}
+
+            for idx, param in enumerate(parameters):
+                if idx < len(pos_args):
+                    value = pos_args[idx]
+                elif param.name in kw_args:
+                    value = kw_args[param.name]
+                elif param.default is not param.empty:
+                    continue  # will use default
+                else:
+                    error(f"Missing required argument '{param.name}'!")
+                    return
+
+                try:
+                    if param.annotation is int:
+                        value = int(value)
+                    elif param.annotation is float:
+                        value = float(value)
+                    # Leave as string or default
+                except ValueError:
+                    error(f"Invalid type for '{param.name}' argument! "
+                          f"Expected '{param.annotation.__name__}'.")
+                    return
+
+                if idx < len(pos_args):
+                    final_args.append(value)
+                else:
+                    final_kwargs[param.name] = value
+
+            i["function"](*final_args, **final_kwargs)
+            return
+
+    error(f"Unknown command '{cmd_name}'! See 'python {filename} help' for help.")
+
+"""
+def handle_commands():
+    if len(sys.argv) < 2:
+        error(f"Missing argument! See `python {filename} help` for help.")
         return
     for i in registered:
         if i["name"] == sys.argv[1]:
             if len(sys.argv)-2 > len(i["parameters"]):
-                print_error(f"Too many arguments! See `python {filename} help` for help.")
+                error(f"Too many arguments! See `python {filename} help` for help.")
             elif len(sys.argv)-2 < i["required_arg_count"]:
-                print_error(f"Missing argument `{i['parameters'][len(sys.argv)-2]}`! See `python {filename} help` for help.")
+                error(f"Missing argument `{i['parameters'][len(sys.argv)-2]}`! See `python {filename} help` for help.")
             else:
                 converted = []
                 for arg in range(len(sys.argv)-2):
@@ -93,10 +172,11 @@ def handle_commands():
                         else:
                             converted.append(sys.argv[2 + arg])
                     except ValueError:
-                        print_error(f"Invalid type for `{i['parameters'][arg].name}` argument! "
+                        error(f"Invalid type for `{i['parameters'][arg].name}` argument! "
                                     f"`{i['parameters'][arg].name}` argument must be type "
                                     f"`{i['parameters'][arg].annotation.__name__}`.")
                         return
                 i["function"](*converted)
             return
-    print_error(f"Unknown argument `{sys.argv[1]}`! See `python {filename} help` for help.")
+    error(f"Unknown argument `{sys.argv[2]}`! See `python {filename} help` for help.")
+"""
