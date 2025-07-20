@@ -51,7 +51,10 @@ def full_workflow(args: str = "", main_content: str = ""):
 def create_dirs(maxi: int):
 	"""Create directories from ex00 to exXX in the current directory."""
 	for i in range(maxi):
-		os.mkdir(f"ex{i :02d}")
+		try :
+			os.mkdir(f"ex{i :02d}")
+		except :
+			print(f"ex{i :02d} already exists !")
 	with open(".gitignore", "w") as f:
 		f.write("a.out\n*.swp")
 
