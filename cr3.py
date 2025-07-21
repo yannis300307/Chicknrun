@@ -105,8 +105,13 @@ def send(files: str, commit_message: str = ""):
 	if ask(f"Confirm push of files {files} with commit message \"{commit_message}\"? (Y/n)").lower() in ("", "y", "yes"):
 		call(["git", "add", files])
 		call(["git", "commit", files, "-m", commit_message])
-		call(["git", "push"])
-		success("Files pushed!")
+		if call(["git", "push"]):
+			if call(["git", "push", "--set-upstream", "origin", "master"]):
+				error("Git push failed!")
+			else:
+				success("Files pushed!")
+		else:
+			sucess("Files pushed!")
 	else:
 		warn("Aborted.")
 
