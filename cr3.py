@@ -114,7 +114,7 @@ def send(files: str, commit_message: str = ""):
 			else:
 				success("Files pushed!")
 		else:
-			sucess("Files pushed!")
+			success("Files pushed!")
 	else:
 		warn("Aborted.")
 
