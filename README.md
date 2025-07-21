@@ -14,6 +14,7 @@ Type `cr3 help` to get a list of all the commands and available flags.
 - Compile and run GDB (`cr3 run_gdb`)
 - One command update (`cr3 update`)
 - Automatic exercises directories and .gitignore creation (`cr3 create_dirs [amount]`)
+- Git add, commit and push in one command (`cr3 send [files] ["commit message"]`)
 
 When generating the main function, all C files in the current directory and subdirectories will be included as well as stdio.h, stdlib.h and unistd.h.
 
