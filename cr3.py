@@ -51,10 +51,7 @@ def full_workflow(args: str = "", main_content: str = ""):
 def create_dirs(maxi: int):
 	"""Create directories from ex00 to exXX in the current directory."""
 	for i in range(maxi):
-		try :
-			os.mkdir(f"ex{i :02d}")
-		except :
-			print(f"ex{i :02d} already exists !")
+		os.mkdir(f"ex{i :02d}")
 	with open(".gitignore", "w") as f:
 		f.write("a.out\n*.swp")
 
@@ -99,7 +96,19 @@ def evaluate():
 	info(f"Opening {len(files)} files in Vim")
 	for file in reversed(files):
 		call(f"gnome-terminal --tab -- vim {file}", shell=True)
-	
+
+@cc.command
+def send(files: str, commit_message: str = ""):
+	"""Git add, commit and push the given files. Can generate an automatic commit message if none is given."""
+	if len(commit_message) == 0:
+		commit_message = "Add " + file + "."
+	if ask(f"Confirm push of files {files} with commit message \"{commit_message}\"? (Y/n)").lower() in ("", "y", "yes"):
+		call(["git", "add", files])
+		call(["git", "commit", files, "-m", commit_message])
+		call(["git", "push"])
+		success("Files pushed!")
+	else:
+		warn("Aborted.")
 
 @cc.command
 def update():
