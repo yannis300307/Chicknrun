@@ -54,7 +54,7 @@ def create_dirs(maxi: int):
 		try :
 			os.mkdir(f"ex{i :02d}")
 		except :
-			print(f"ex{i :02d} already exists !")
+			warn(f"ex{i :02d} already exists !")
 	with open(".gitignore", "w") as f:
 		f.write("a.out\n*.swp")
 
