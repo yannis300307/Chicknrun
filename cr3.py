@@ -101,7 +101,7 @@ def evaluate():
 def send(files: str, commit_message: str = ""):
 	"""Git add, commit and push the given files. Can generate an automatic commit message if none is given."""
 	if len(commit_message) == 0:
-		commit_message = "Add " + file + "."
+		commit_message = "Add " + files + "."
 	if ask(f"Confirm push of files {files} with commit message \"{commit_message}\"? (Y/n)").lower() in ("", "y", "yes"):
 		call(["git", "add", files])
 		call(["git", "commit", files, "-m", commit_message])
