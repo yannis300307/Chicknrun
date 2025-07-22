@@ -21,7 +21,7 @@ def run_main(content: str = ""):
 	"""Add a custom main to the program and run it. It doesn't modify the file."""
 	files = "".join([f"#include \\\"{f[2:]}\\\"\\n" for f in getoutput("find . -name \"*.c\"").split("\n")])
 
-	if call("printf '%b\\n' \"#include <stdio.h>\\n#include <stdlib.h>\\n#include <unistd.h>\\n" + files + "int main() {" + content + "}\" | cc -Wall -Wextra -Werror -o binary -x c -", shell=True) == 0:
+	if call("printf '%b\\n' \"#include <stdio.h>\\n#include <string.h>\\n#include <stdlib.h>\\n#include <unistd.h>\\n" + files + "int main() {" + content + "}\" | cc -Wall -Wextra -Werror -o binary -x c -", shell=True) == 0:
 		call("./binary", shell=True)
 		os.remove("./binary")
 
